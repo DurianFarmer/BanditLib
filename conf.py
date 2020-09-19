@@ -25,7 +25,7 @@ datasets_address = '/if15/qw2ky/MyResearch/datasets/'  # should be modified acco
 Kmeansdata_address = './Dataset/Yahoo/YahooKMeansModel'
 LastFM_address = './Dataset/hetrec2011-lastfm-2k'
 Delicious_address = './Dataset/hetrec2011-delicious-2k'
-Yahoo_address = '/../../../zf15/hw7ww/Bandit/YahooData/R6'
+Yahoo_address = './Dataset/Yahoo/YahooData'
 
 LastFM_FeatureVectorsFileName = os.path.join(LastFM_address, 'Arm_FeatureVectors_2.dat')
 LastFM_relationFileName = os.path.join(LastFM_address, 'user_friends.dat.mapped')

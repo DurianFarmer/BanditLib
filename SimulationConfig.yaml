@@ -8,6 +8,7 @@
 
 # System level settings to be used in all algorithms
 general:
+# Total change this if you change the dataset
   testing_iterations: 100 # (int) Number of iterations to testing and refine model upon
   training_iterations: 0 # (int) Number of iterations to train a model
   context_dimension: 16 # (int) The number of features which the algorithm knows about each article
@@ -15,7 +16,7 @@ general:
   pool_article_size: 10 # (int) Number of articles to select from total pool from which the algorithm can choose
   batch_size: 1 # (int) 
   testing_method: 'online' # (string) online: update the model after each iterations
-  plot: True # (True/False) Should plots be created
+  plot: False # (True/False) Should plots be created
   collaborative: True # (True/False) connection between collaborative user and social_linear rewards
   dataset: None # (string None/LastFM/Delicious/Yahoo) Choosing a dataset rather than simluation will override some of the other paramaters
 
@@ -57,7 +58,7 @@ alg:
   # Specific Parameters, setting in this section under an algorithm will overwrite default and 
   #   general parameters for that algorithm
   specific:
-    LinUCB:
+    NeuralUCB:
       alpha: 0.3
       lambda_: 1
       parameters:
@@ -65,6 +66,14 @@ alg:
         CoTheta: False
         W: False
         V: False
+    # LinUCB:
+    #   alpha: 0.3
+    #   lambda_: 1
+    #   parameters:
+    #     Theta: True
+    #     CoTheta: False
+    #     W: False
+    #     V: False
     #LinPHE:
     #  a: 1 
     #  lambda_: 0.1

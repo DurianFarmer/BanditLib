@@ -25,7 +25,7 @@ from lib.UCBPMF import UCBPMFAlgorithm
 from lib.FairUCB import FairUCBAlgorithm
 from lib.ThompsonSampling import ThompsonSamplingAlgorithm
 from lib.LinPHE import LinPHEAlgorithm
-from lib.MLP import * 
+# from lib.MLP import * 
 
 import warnings
 

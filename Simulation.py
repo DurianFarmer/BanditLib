@@ -33,6 +33,7 @@ from lib.UCBPMF import UCBPMFAlgorithm
 from lib.FairUCB import FairUCBAlgorithm
 from lib.ThompsonSampling import ThompsonSamplingAlgorithm
 from lib.LinPHE import LinPHEAlgorithm
+from lib.NeuralUCB import NeuralUCBAlgorithm
 
 def pca_articles(articles, order):
 	X = []
