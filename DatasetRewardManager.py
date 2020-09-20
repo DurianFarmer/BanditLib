@@ -113,7 +113,8 @@ class DatasetRewardManager():
                         if i % 1000 == 0:
                             self.batchRecord(algorithms, i, tstart, RandomChoice, AlgPicked)
                             self.write_regret_to_file(filenameWriteRegret, algorithms, BatchCumlateRegret, i, RandomChoice.regret)
-                self.plot_result(algorithms, BatchCumlateRegret, tim_, RandomChoiceRegret, AlgRewardRatio_vsRandom)
+                if self.plot:
+                    self.plot_result(algorithms, BatchCumlateRegret, tim_, RandomChoiceRegret, AlgRewardRatio_vsRandom)
 
 
         def plot_result(self, algorithms, BatchCumlateRegret, tim_, RandomChoiceRegret, AlgRewardRatio_vsRandom):

@@ -35,20 +35,10 @@ class NeuralUCBAlgorithm(BaseAlg):
             articles.append(pool_articles[pool_positions[i]])
         return articles
 
-    # def getProb(self, pool_articles, userID):
-    #     means = []
-    #     vars = []
-    #     for x in pool_articles:
-    #         x_pta, mean, var = self.users[userID].getProb_plot(
-    #             self.alpha, x.contextFeatureVector[:self.dimension])
-    #         means.append(mean)
-    #         vars.append(var)
-    #     print 'This is USED'
-    #     return means, vars
-
     def updateParameters(self, articlePicked, click, userID):
         self.users[userID].updateParameters(
             articlePicked.contextFeatureVector[:self.dimension], click)
 
     def getTheta(self, userID):
+        # This function is only used in simulation problem
         return self.users[userID].UserTheta
