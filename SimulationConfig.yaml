@@ -58,14 +58,18 @@ alg:
   # Specific Parameters, setting in this section under an algorithm will overwrite default and 
   #   general parameters for that algorithm
   specific:
-    NeuralUCB:
-      alpha: 0.3
-      lambda_: 1
-      parameters:
-        Theta: True
-        CoTheta: False
-        W: False
-        V: False
+    # NeuralUCB:
+    #   alpha: 0.3
+    #   lambda_: 1
+    #   parameters:
+    #     Theta: True
+    #     CoTheta: False
+    #     W: False
+    #     V: False
+    MLP:
+      hidden_layer_dimension: 16
+      threshold: 0.001
+      learning_rate: 0.01
     # LinUCB:
     #   alpha: 0.3
     #   lambda_: 1
