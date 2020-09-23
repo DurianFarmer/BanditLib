@@ -18,7 +18,7 @@ general:
   testing_method: 'online' # (string) online: update the model after each iterations
   plot: False # (True/False) Should plots be created
   collaborative: True # (True/False) connection between collaborative user and social_linear rewards
-  dataset: Yahoo # (string None/LastFM/Delicious/Yahoo) Choosing a dataset rather than simluation will override some of the other paramaters
+  dataset: LastFM # (string None/LastFM/Delicious/Yahoo) Choosing a dataset rather than simluation will override some of the other paramaters
 
 # Different settings for user objects
 user:
@@ -58,26 +58,26 @@ alg:
   # Specific Parameters, setting in this section under an algorithm will overwrite default and 
   #   general parameters for that algorithm
   specific:
-    # NeuralUCB:
-    #   alpha: 0.3
-    #   lambda_: 1
-    #   parameters:
-    #     Theta: True
-    #     CoTheta: False
-    #     W: False
-    #     V: False
-    MLP:
+    NeuralUCB:
       hidden_layer_dimension: 16
-      threshold: 0.001
-      learning_rate: 0.01
-    # LinUCB:
-    #   alpha: 0.3
-    #   lambda_: 1
-    #   parameters:
-    #     Theta: True
-    #     CoTheta: False
-    #     W: False
-    #     V: False
+      thres: 0.0001
+      lr: 0.001
+      decay: 1
+      iter: 1000
+      sz: 1024
+      lamdba: 1
+      nu: 0.3
+      device: 'cpu'
+
+    LinUCB:
+      alpha: 0.3
+      lambda_: 1
+      parameters:
+        Theta: True
+        CoTheta: False
+        W: False
+        V: False
+
     #LinPHE:
     #  a: 1 
     #  lambda_: 0.1
@@ -86,6 +86,7 @@ alg:
     #    CoTheta: False
     #    W: False
     #    V: False
+
     #ThompsonSampling:
     #   lambda_: 0.1
     #   R: .0001 
@@ -96,6 +97,7 @@ alg:
     #     CoTheta: False
     #     W: False
     #     V: False
+
     #CoLinUCB:
     #  alpha: 0.3
     #  lambda_: 0.1
@@ -105,6 +107,7 @@ alg:
     #    CoTheta: True
     #    W: False
     #    V: False
+
     #GOBLin:
     #  alpha: 0.3
     #  lambda_: 0.1
@@ -114,6 +117,7 @@ alg:
     #    CoTheta: True
     #    W: False
     #    V: False
+
     #HLinUCB:
     #  alpha: 0.3
     #  alpha2: 0.1
@@ -123,6 +127,7 @@ alg:
     #    CoTheta: True
     #    W: False
     #    V: True
+
     #FairUCB:
     #  alpha: 0.3
     #  lambda_: 0.1
@@ -131,6 +136,7 @@ alg:
     #    CoTheta: False
     #    W: False
     #    V: False
+
     #UCBPMF:
     #  sigma : 0.5
     #  sigmaU : 1 
@@ -141,6 +147,7 @@ alg:
     #    CoTheta: False
     #    W: False
     #    V: False
+
     #FactorUCB:
     #  alpha: 0.05
     #  alpha2: 0.025
@@ -150,6 +157,7 @@ alg:
     #    CoTheta: True
     #    W: False
     #    V: True
+
     #CLUB:
     #  alpha: 0.1
     #  alpha2: 0.5
@@ -160,6 +168,7 @@ alg:
     #    CoTheta: False
     #    W: False
     #    V: False
+    
     #PTS:
     #  particle_num : 10 
     #  sigma : 0.5
