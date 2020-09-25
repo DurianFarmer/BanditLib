@@ -11,7 +11,7 @@ general:
 # Total change this if you change the dataset
   testing_iterations: 100 # (int) Number of iterations to testing and refine model upon
   training_iterations: 0 # (int) Number of iterations to train a model
-  context_dimension: 5 # (int) The number of features which the algorithm knows about each article
+  context_dimension: 25 # (int) The number of features which the algorithm knows about each article
   hidden_dimension: 0 # (int) The number of features hidden from the algorithms
   pool_article_size: 10 # (int) Number of articles to select from total pool from which the algorithm can choose
   batch_size: 1 # (int) 
@@ -60,23 +60,18 @@ alg:
   specific:
     NeuralUCB:
       hidden_layer_dimension: 16
-      thres: 0.0001
-      lr: 0.001
-      decay: 1
+      thres: 0.000001
+      lr: 0.01
+      decay: 1.0
       iter: 1000
-      sz: 1024
-      lamdba: 1
+      sz: 100000
+      lamdba: 1.0
       nu: 0.3
       device: 'cpu'
 
     LinUCB:
       alpha: 0.3
       lambda_: 1
-      parameters:
-        Theta: True
-        CoTheta: False
-        W: False
-        V: False
 
     #LinPHE:
     #  a: 1 

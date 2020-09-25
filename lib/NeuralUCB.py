@@ -7,18 +7,18 @@ from util_functions import vectorize
 from Recommendation import Recommendation
 from BaseAlg import BaseAlg
 
-
 class NeuralUCB(torch.nn.Module):
     def __init__(self, input_dim, hidden_dim, thres, lr, decay, iter):
         super(NeuralUCB, self).__init__()
         # self.linear1 = torch.nn.Linear(input_dim, hidden_dim)
         # self.linear2 = torch.nn.Linear(hidden_dim, 1)
-        self.linear = torch.nn.Linear(input_dim, 1)
+        self.linear = torch.nn.Linear(input_dim, 1, bias=False)
         self.relu = torch.nn.ReLU()
         self.loss_func = torch.nn.MSELoss()
         self.thres = thres
         self.optimizer = torch.optim.SGD(
             self.parameters(), lr=lr, weight_decay=decay)
+        self.decay = decay
         self.iter = iter
         self.total_param = sum(p.numel()
                                for p in self.parameters() if p.requires_grad)
@@ -40,6 +40,8 @@ class NeuralUCB(torch.nn.Module):
         return score.view(-1).detach(), g
 
     def update_model(self, feature_vec, clicks):
+        # print self.optimizer.param_groups[0]['weight_decay'], clicks.shape[0]
+        self.optimizer.param_groups[0]['weight_decay'] = self.decay / clicks.shape[0]
         self.train()
         prev_loss = float('inf')
         early_stopping = 0
@@ -59,8 +61,6 @@ class NeuralUCB(torch.nn.Module):
                 break
             prev_loss = loss.item()
         self.eval()
-        if i == self.iter:
-            print '%.2E' % loss.item(), clicks.shape
         return loss.item()
 
 
@@ -96,8 +96,8 @@ class NeuralUCBUserStruct:
     def decide(self, feature_pool):
         score_g = torch.cat([torch.cat(self.learner.forward_calc_g(
             x.view(-1))).view(1, -1) for x in feature_pool])
-        UCB = torch.sum(score_g[:, 1:] * score_g[:, 1:] / self.U, dim=1)
-        arm = torch.argmax(self.nu * UCB + score_g[:, 1]).item()
+        UCB = torch.sqrt(torch.sum(score_g[:, 1:] * score_g[:, 1:] / self.U, dim=1))
+        arm = torch.argmax(self.nu * UCB + score_g[:, 0]).item()
         self.U += score_g[arm, 1:] * score_g[arm, 1:]
         return arm
 
@@ -105,6 +105,7 @@ class NeuralUCBUserStruct:
 class NeuralUCBAlgorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)
+        print arg_dict
         torch.set_num_threads(8)
         self.users = [
             NeuralUCBUserStruct(self.dimension, self.hidden_layer_dimension, self.thres, self.device, self.lr, self.decay, self.iter, self.sz, self.lamdba, self.nu) for _ in range(self.n_users)

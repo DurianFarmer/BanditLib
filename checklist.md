@@ -1,10 +1,10 @@
 ## Questions
-- [] In MLP, we matain a different network for different user? So in first version of NUCB, we do the same thing?
-- [] Indeed take days to finish yahoo dataset, so I did not check the performance on that dataset. How to split the dataset in configuration file?
-- [] In MLP snippet, the author mentioned that converting the tensor to GPU is slower than do it on CPU totally, is that true?
+- [x] In MLP, we matain a different network for different user? So in first version of NUCB, we do the same thing?
+- [x] Indeed take days to finish yahoo dataset, so I did not check the performance on that dataset. How to split the dataset in configuration file?
+- [x] In MLP snippet, the author mentioned that converting the tensor to GPU is slower than do it on CPU totally, is that true?
 - [x] MLP snippet, why only 1 cpu used? I checked `torch.get_num_thread()` and set `torch.set_num_thread(8)`, but it not works.
-- [] MLP, only train with the fresh sampled data until `loss < thres`? Super overfitting?
-- [] Ln175@YahooRewardManager.py, why we only update when the guess is correct? Or I miss something important?
+- [x] MLP, only train with the fresh sampled data until `loss < thres`? Super overfitting?
+- [x] Ln175@YahooRewardManager.py, why we only update when the guess is correct? Or I miss something important?
 
 ## TODO list
 - [x] Code review
