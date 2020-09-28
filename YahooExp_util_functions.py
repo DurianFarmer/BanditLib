@@ -91,7 +91,7 @@ def parseLine_ID(line):
 
 def save_to_file(fileNameWrite, recordedStats, tim):
     with open(fileNameWrite, 'a+') as f:
-        f.write('data') # the observation line starts with data;
+        f.write('data')  # the observation line starts with data;
         f.write(',' + str(tim))
         f.write(',' + ';'.join([str(x) for x in recordedStats]))
         f.write('\n')

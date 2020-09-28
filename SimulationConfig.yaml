@@ -11,14 +11,14 @@ general:
 # Total change this if you change the dataset
   testing_iterations: 100 # (int) Number of iterations to testing and refine model upon
   training_iterations: 0 # (int) Number of iterations to train a model
-  context_dimension: 25 # (int) The number of features which the algorithm knows about each article
+  context_dimension:  5 # (int) The number of features which the algorithm knows about each article
   hidden_dimension: 0 # (int) The number of features hidden from the algorithms
   pool_article_size: 10 # (int) Number of articles to select from total pool from which the algorithm can choose
   batch_size: 1 # (int) 
   testing_method: 'online' # (string) online: update the model after each iterations
   plot: False # (True/False) Should plots be created
   collaborative: True # (True/False) connection between collaborative user and social_linear rewards
-  dataset: LastFM # (string None/LastFM/Delicious/Yahoo) Choosing a dataset rather than simluation will override some of the other paramaters
+  dataset: Yahoo # (string None/LastFM/Delicious/Yahoo) Choosing a dataset rather than simluation will override some of the other paramaters
 
 # Different settings for user objects
 user:
@@ -79,7 +79,7 @@ alg:
       lamdba: 0.01
       nu: 0.001
       device: 'cuda'
-    
+
     NeuralUCB2:
       hidden_layer_dimension: 32
       thres: 0.0001

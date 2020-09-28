@@ -69,7 +69,21 @@ class YahooRewardManager():
                 print(alg_name, algCTR/randomLearnCTR, algCTR,
                       alg.learn_stats.accesses, alg.learn_stats.clicks)
             # write to file
-            # save_to_file(fileNameWrite, recordedStats, tim)
+            save_to_file(fileNameWrite, recordedStats, tim)
+
+        def WriteStat():
+            with open(fileNameWriteStatTP, 'a+') as f:
+                for key, val in articleTruePositve.items():
+                    f.write(str(key) + ';' + str(val) + ',')
+                f.write('\n')
+            with open(fileNameWriteStatTN, 'a+') as f:
+                for key, val in articleTrueNegative.items():
+                    f.write(str(key) + ';' + str(val) + ',')
+                f.write('\n')
+            with open(fileNameWriteStatFP, 'a+') as f:
+                for key, val in articleFalsePositive.items():
+                    f.write(str(key) + ';' + str(val) + ',')
+                f.write('\n')
 
         def calculateStat():
             if click:
@@ -86,7 +100,8 @@ class YahooRewardManager():
         tstart = datetime.datetime.now()
         timeRun = datetime.datetime.now().strftime(
             '_%m_%d_%H_%M')     # the current data time
-        dataDays = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+        dataDays = ['01']
+        # fileSig = str(alg_name) + str(clusterNum) + 'SP' + str(SparsityLevel) + algName
 
         articleTruePositve = {}
         articleFalseNegative = {}
@@ -113,42 +128,29 @@ class YahooRewardManager():
         totalObservations = 0
 
         for dataDay in dataDays:
-            #	if args.load:
-            #	    if int(dataDay)< finished_day:
-            #		continue
+
             fileName = Yahoo_address + "/ydata-fp-td-clicks-v1_0.200905" + \
                 dataDay + '.' + str(userNum) + '.userID'
-            #fileNameWrite = os.path.join(Yahoo_save_address, fileSig + dataDay + timeRun + '.csv')
+            fileNameWrite = os.path.join(Yahoo_save_address, dataDay + timeRun + '.csv')
 
-            #fileNameWriteStatTP = os.path.join(Yahoo_save_address, 'Stat_TP'+ fileSig + dataDay + timeRun + '.csv')
-            #fileNameWriteStatTN = os.path.join(Yahoo_save_address, 'Stat_TN'+ fileSig + dataDay + timeRun + '.csv')
-            #fileNameWriteStatFP = os.path.join(Yahoo_save_address, 'Stat_FP'+ fileSig + dataDay + timeRun + '.csv')
+            fileNameWriteStatTP = os.path.join(Yahoo_save_address, 'Stat_TP' + dataDay + timeRun + '.csv')
+            fileNameWriteStatTN = os.path.join(Yahoo_save_address, 'Stat_TN' + dataDay + timeRun + '.csv')
+            fileNameWriteStatFP = os.path.join(Yahoo_save_address, 'Stat_FP' + dataDay + timeRun + '.csv')
 
-            # put some new data in file for readability
-            # with open(fileNameWrite, 'a+') as f:
-            #    f.write('\nNewRunat  ' + datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'))
-            #    f.write('\n,Time,RandomCTR;'+ str(algName) + 'CTR;' + 'accesses;'+ 'clicks;' + '' +'\n')
+            with open(fileNameWrite, 'a+') as f:
+                f.write('\nNewRunAt  ' + datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'))
+                f.write('\n,Time,RandomCTR;')
+                for alg_name, alg in algorithms.items():
+                    f.write(str(alg_name) + 'CTR;' + str(alg_name) + 'accesses;' + str(alg_name) + 'clicks;' + '' + '\n')
 
-            # with open(fileName, 'r') as f:
-            #	i = 0
-            #	for i, line in enumerate(f, 1):
-            #		continue
-            #	print i 4681992
-
-            #print (fileName, fileNameWrite)
             print(fileName)
             with open(fileName, 'r') as f:
                 # reading file line ie observations running one at a time
                 for i, line in enumerate(f, 1):
-                    # if args.load:
-                    #    if i< finished_line:
-                    #	continue
-                    totalObservations += 1
 
-                    tim, article_chosen, click, currentUserID, pool_articles = parseLine_ID(
-                        line)
-                    #currentUser_featureVector = user_features[:-1]
-                    #currentUserID = getIDAssignment(np.asarray(currentUser_featureVector), userFeatureVectors)
+                    tim, article_chosen, click, currentUserID, pool_articles = parseLine_ID(line)
+                    # currentUser_featureVector = user_features[:-1]
+                    # currentUserID = getIDAssignment(np.asarray(currentUser_featureVector), userFeatureVectors)
                     # -----------------------------Pick an article (CoLinUCB, LinUCB, Random)-------------------------
                     articlePool = []
                     currentArticles = []
@@ -157,14 +159,13 @@ class YahooRewardManager():
                     for article in pool_articles:
                         article_featureVector = np.asarray(article[1:6])
                         user_featureVector = userFeatureVectors[currentUserID]
-                        combined_featureVector = np.outer(
-                            article_featureVector, user_featureVector).flatten()
-                        # We can choose the feature vector to be an outer product of the article and user vector if we want more information
-                        #combined_featureVector= np.asarray(article[1:6])
+                        combined_featureVector = np.outer(article_featureVector, user_featureVector).flatten()
+                        # We can choose the feature vector to be an outer product of the article and user vector
+                        # if we want more information
+                        # combined_featureVector= np.asarray(article[1:6])
                         if len(article_featureVector) == 5:
                             article_id = int(article[0])
-                            articlePool.append(
-                                Article(article_id, article_featureVector))
+                            articlePool.append(Article(article_id, article_featureVector))
                             currentArticles.append(article_id)
                     shuffle(articlePool)
 
@@ -178,11 +179,10 @@ class YahooRewardManager():
                     articles_random.learn_stats.addrecord(click)
 
                     for alg_name, alg in algorithms.items():
-                        pickedArticle = alg.createRecommendation(
-                            articlePool, currentUserID, self.k)
+                        pickedArticle = alg.createRecommendation(articlePool, currentUserID, self.k)
                         pickedArticle = pickedArticle.articles[0]
 
-                        if (pickedArticle.id == article_chosen):
+                        if pickedArticle.id == article_chosen:
                             alg.learn_stats.addrecord(click)
                             alg.updateParameters(
                                 pickedArticle, click, currentUserID)
@@ -195,23 +195,27 @@ class YahooRewardManager():
                         articles_random.learn_stats.updateCTR()
                         for alg in algorithms.values():
                             algCTR = alg.learn_stats.updateCTR()
+                        printWrite()
+
                 # print stuff to screen and save parameters to file when the Yahoo! dataset file ends
-                printWrite()
+                print("Day " + dataDay + " + Time Elapsed: ", str(datetime.datetime.now() - tstart))
+                # plot_results(algorithms, articles_random)
 
 
-def plot_results(algorithms, random):
-    num_data_points = len(random.learn_stats.cumulative_CTR_list)
-    tim_ = [i for i in range(num_data_points)]
-    random_CTR_list = random.learn_stats.cumulative_CTR_list
 
-    f, axa = plt.subplots(1, sharex=True)
-    for alg_name, alg in algorithms.items():
-        alg_CTR_list = alg.learn_stats.cumulative_CTR_list
-        alg_normalized_CTR = [alg_CTR/rand_CTR for alg_CTR,
-                              rand_CTR in zip(alg_CTR_list, random_CTR_list)]
-        axa.plot(tim_, alg_normalized_CTR, label=alg_name)
-    plt.xlabel('time')
-    plt.ylabel('CTR-Ratio')
-    plt.legend(loc='lower right')
-    plt.title('Yahoo 160 Users')
-    plt.show()
+# def plot_results(algorithms, random):
+#     num_data_points = len(random.learn_stats.cumulative_CTR_list)
+#     tim_ = [i for i in range(num_data_points)]
+#     random_CTR_list = random.learn_stats.cumulative_CTR_list
+#
+#     f, axa = plt.subplots(1, sharex=True)
+#     for alg_name, alg in algorithms.items():
+#         alg_CTR_list = alg.learn_stats.cumulative_CTR_list
+#         alg_normalized_CTR = [alg_CTR/rand_CTR for alg_CTR,
+#                               rand_CTR in zip(alg_CTR_list, random_CTR_list)]
+#         axa.plot(tim_, alg_normalized_CTR, label=alg_name)
+#     plt.xlabel('time')
+#     plt.ylabel('CTR-Ratio')
+#     plt.legend(loc='lower right')
+#     plt.title('Yahoo 160 Users')
+#     plt.show()

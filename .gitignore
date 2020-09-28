@@ -4,8 +4,11 @@
 Results/SimulationResults/*.csv
 Results/DeliciousResults/*.csv
 Results/LastFMResults/*.csv
+Results/YahooResults/*.csv
 Dataset/hetrec2011-delicious-2k/user_contacts.dat.mapped.cluster
 Dataset/hetrec2011-lastfm-2k/user_friends.dat.mapped.cluster
 *.ipynb
 .ipynb_checkpoints/*
 .vscode/*
+venv/*
+.idea/*
