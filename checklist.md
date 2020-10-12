@@ -15,3 +15,6 @@
 ## Performance check
 - LastFM@NUCB: 20sec@1000DP @8thread CPU, start up, 1000iter, bufsz 1024
 - Linear-NeuralUCB is (slightly) weaker than LinearUCB (same parameter), might be: 1024 buffer + inv diag approx, esp. 1024 buffer on ~96k dataset.
+
+## Record
+- LastFM: NUCB fails because for each user, there are only ~<500 samples, too limited for training a neural network

@@ -10,10 +10,13 @@ from BaseAlg import BaseAlg
 class NeuralUCB(torch.nn.Module):
     def __init__(self, input_dim, hidden_dim, thres, lr, decay, iter):
         super(NeuralUCB, self).__init__()
+        stddev = 1 / math.sqrt(float(hidden_dim))
         self.linear1 = torch.nn.Linear(input_dim, hidden_dim)
-        self.linear2 = torch.nn.Linear(hidden_dim, 1)
+        self.linear2 = torch.nn.Linear(hidden_dim, 1, bias=False)
+        torch.nn.init.uniform_(self.linear2.weight, a=0.0, b=stddev)
         # self.linear = torch.nn.Linear(input_dim, 1, bias=False)
         self.relu = torch.nn.ReLU()
+        self.softmax = torch.nn.Softmax()
         self.loss_func = torch.nn.MSELoss()
         self.thres = thres
         self.optimizer = torch.optim.SGD(
@@ -37,7 +40,7 @@ class NeuralUCB(torch.nn.Module):
                 [], device=torch.device('cuda'))
             for p in self.parameters()
         ])
-        return score.view(-1).detach(), g
+        return score.view(-1).detach(), g.detach()
 
     def update_model(self, feature_vec, clicks):
         # print self.optimizer.param_groups[0]['weight_decay'], clicks.shape[0]
@@ -60,7 +63,6 @@ class NeuralUCB(torch.nn.Module):
             if early_stopping >= 5:
                 break
             prev_loss = loss.item()
-        print feature_vec.shape, clicks.shape, pred.shape
         self.eval()
         return loss.item()
 
@@ -82,7 +84,6 @@ class NeuralUCBUserStruct:
 
     def updateParameters(self, feature_vec, click):
         # update the sampling buffer
-        # print self.feature_history.shape, self.click_history.shape
         if self.current_size < self.buffer_size:
             self.click_history = torch.cat((self.click_history, click))
             self.feature_history = torch.cat(
@@ -99,11 +100,8 @@ class NeuralUCBUserStruct:
         score_g = torch.cat([torch.cat(self.learner.forward_calc_g(
             x.view(-1))).view(1, -1) for x in feature_pool])
         UCB = torch.sqrt(torch.sum(score_g[:, 1:] * score_g[:, 1:] / self.U, dim=1))
-        # print UCB, score_g[:, 0]
-        # print '-' * 5
-        arm = torch.argmax(self.nu * UCB + score_g[:, 0]).item()
-        self.U += score_g[arm, 1:] * score_g[arm, 1:]
-        return arm
+        arm = torch.argmax(torch.normal(score_g[:, 0], self.nu * UCB)).item()
+        return arm, score_g[arm, 1:]
 
 
 class NeuralUCBAlgorithm(BaseAlg):
@@ -114,19 +112,22 @@ class NeuralUCBAlgorithm(BaseAlg):
         self.users = [
             NeuralUCBUserStruct(self.dimension, self.hidden_layer_dimension, self.thres, self.device, self.lr, self.decay, self.iter, self.sz, self.lamdba, self.nu) for _ in range(self.n_users)
         ]
+        self.feature_vec = None
 
     def decide(self, pool_articles, userID, k=1):
         X = torch.cat([torch.from_numpy(x.contextFeatureVector[:self.dimension]).view(1, -1).to(self.device, torch.float32)
                        for x in pool_articles])
-        # print X.shape, self.users[userID].click_history.shape
-        return [pool_articles[self.users[userID].decide(X)]]
+        arm, self.feature_vec = self.users[userID].decide(X)
+        return [pool_articles[arm]]
 
     def updateParameters(self, articlePicked, click, userID):
+        self.users[userID].U += self.feature_vec * self.feature_vec
         return self.users[userID].updateParameters(
             torch.from_numpy(articlePicked.contextFeatureVector[:self.dimension]).to(
                 self.device, torch.float32),
             torch.tensor([click], device=self.device, dtype=torch.float32)
         )
+
 class NeuralUCB1Algorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)

@@ -33,7 +33,9 @@ from lib.UCBPMF import UCBPMFAlgorithm
 from lib.FairUCB import FairUCBAlgorithm
 from lib.ThompsonSampling import ThompsonSamplingAlgorithm
 from lib.LinPHE import LinPHEAlgorithm
-# from lib.NeuralUCB import NeuralUCBAlgorithm, NeuralUCB1Algorithm, NeuralUCB2Algorithm
+from lib.NeuralUCB import NeuralUCBAlgorithm, NeuralUCB1Algorithm, NeuralUCB2Algorithm
+from lib.NeuralCF import NeuralCFAlgorithm
+from lib.NeuralGlobal import NeuralGlobalAlgorithm
 from lib.MLP import MLPAlgorithm
 
 def pca_articles(articles, order):

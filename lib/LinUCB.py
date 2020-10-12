@@ -137,6 +137,8 @@ class LinUCBAlgorithm(BaseAlg):
         return means, vars
 
     def updateParameters(self, articlePicked, click, userID):
+        if userID == 87:
+            print articlePicked.contextFeatureVector[:self.dimension]
         self.users[userID].updateParameters(
             articlePicked.contextFeatureVector[:self.dimension], click)
 

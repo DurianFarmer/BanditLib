@@ -65,9 +65,9 @@ class YahooRewardManager():
                 recordedStats.append(algCTR)
                 recordedStats.append(alg.learn_stats.accesses)
                 recordedStats.append(alg.learn_stats.clicks)
-                print(randomLearnCTR)
-                print(alg_name, algCTR/randomLearnCTR, algCTR,
-                      alg.learn_stats.accesses, alg.learn_stats.clicks)
+                # print(randomLearnCTR)
+                # print(alg_name, algCTR/randomLearnCTR, algCTR,
+                #       alg.learn_stats.accesses, alg.learn_stats.clicks)
             # write to file
             save_to_file(fileNameWrite, recordedStats, tim)
 
@@ -100,7 +100,7 @@ class YahooRewardManager():
         tstart = datetime.datetime.now()
         timeRun = datetime.datetime.now().strftime(
             '_%m_%d_%H_%M')     # the current data time
-        dataDays = ['01']
+        dataDays = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
         # fileSig = str(alg_name) + str(clusterNum) + 'SP' + str(SparsityLevel) + algName
 
         articleTruePositve = {}
@@ -123,7 +123,7 @@ class YahooRewardManager():
             Kmeansdata_address, '10kmeans_model'+str(clusterNum) + '.dat')
         userFeatureVectors = getClusters(fileNameWriteCluster)
         # Yahoo dataset does not come with user labels
-        # We group users my kmeans clustering
+        # We group users my kmeans clusterin
 
         totalObservations = 0
 
