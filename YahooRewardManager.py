@@ -102,6 +102,7 @@ class YahooRewardManager():
             '_%m_%d_%H_%M')     # the current data time
         dataDays = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
         # fileSig = str(alg_name) + str(clusterNum) + 'SP' + str(SparsityLevel) + algName
+        # dataDays = ['01']
 
         articleTruePositve = {}
         articleFalseNegative = {}
@@ -115,6 +116,17 @@ class YahooRewardManager():
         alg_CTR = {}
         for alg_name, alg in algorithms.items():
             alg.learn_stats = articleAccess()
+
+
+        # add algorithm setting to saved filename
+        if len(algorithms) == 1:
+            alg_name = list(algorithms)[0]
+            alg = algorithms[alg_name]
+            algo_param = "{}_{}_{}_{}_{}".format(alg_name, alg.lambda_, alg.alpha, alg.iters, alg.lr)
+        else:
+            algo_param = ""
+
+
 
         clusterNum = 160
         userNum = 160
@@ -131,7 +143,7 @@ class YahooRewardManager():
 
             fileName = Yahoo_address + "/ydata-fp-td-clicks-v1_0.200905" + \
                 dataDay + '.' + str(userNum) + '.userID'
-            fileNameWrite = os.path.join(Yahoo_save_address, dataDay + timeRun + '.csv')
+            fileNameWrite = os.path.join(Yahoo_save_address, algo_param + "_" + dataDay + timeRun + '.csv')
 
             fileNameWriteStatTP = os.path.join(Yahoo_save_address, 'Stat_TP' + dataDay + timeRun + '.csv')
             fileNameWriteStatTN = os.path.join(Yahoo_save_address, 'Stat_TN' + dataDay + timeRun + '.csv')
@@ -196,6 +208,9 @@ class YahooRewardManager():
                         for alg in algorithms.values():
                             algCTR = alg.learn_stats.updateCTR()
                         printWrite()
+
+                    # if totalObservations % 10000 == 0:
+                    #     break
 
                 # print stuff to screen and save parameters to file when the Yahoo! dataset file ends
                 print("Day " + dataDay + " + Time Elapsed: ", str(datetime.datetime.now() - tstart))

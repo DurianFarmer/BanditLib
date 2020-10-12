@@ -61,15 +61,16 @@ alg:
     NeuralCF:
       device: 'cuda'
       hidden_dim: 4
-      lamdba: 0.1
+      lamdba_: 0.1
       alpha: 0.1
       sz: 10000
       lr: 0.001
       iter: 100
 
-    # LinUCB:
-    #   alpha: 0.1
-    #   lambda_: 0.1
+#     LinUCB:
+#       alpha: 0.1
+#       lambda_: 0.1
+#       lr: 0.001
 
     #LinPHE:
     #  a: 1 
