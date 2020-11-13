@@ -13,3 +13,4 @@ Dataset/*
 .vscode/*
 venv/*
 .idea/*
+Results/YahooResults/old/*

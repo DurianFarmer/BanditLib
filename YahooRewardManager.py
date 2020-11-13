@@ -122,7 +122,7 @@ class YahooRewardManager():
         if len(algorithms) == 1:
             alg_name = list(algorithms)[0]
             alg = algorithms[alg_name]
-            algo_param = "{}_{}_{}_{}_{}".format(alg_name, alg.lambda_, alg.alpha, alg.iters, alg.lr)
+            algo_param = "{}_{}_{}_{}_{}".format(alg_name, alg.lambda_, alg.alpha, alg.iter, alg.lr)
         else:
             algo_param = ""
 
