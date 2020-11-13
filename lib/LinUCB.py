@@ -1,7 +1,7 @@
 import numpy as np
 from util_functions import vectorize
 from Recommendation import Recommendation
-from BaseAlg import BaseAlg
+from .BaseAlg import BaseAlg
 
 
 class LinUCBUserStruct:
@@ -138,7 +138,7 @@ class LinUCBAlgorithm(BaseAlg):
 
     def updateParameters(self, articlePicked, click, userID):
         if userID == 87:
-            print articlePicked.contextFeatureVector[:self.dimension]
+            print(articlePicked.contextFeatureVector[:self.dimension])
         self.users[userID].updateParameters(
             articlePicked.contextFeatureVector[:self.dimension], click)
 
@@ -151,7 +151,7 @@ class LinUCBAlgorithm(BaseAlg):
         return self.users[userID].UserTheta
 
     # def getW(self, userID):
-    # 	return np.identity(n = len(self.users))
+    #   return np.identity(n = len(self.users))
 
 
 # -----------LinUCB select user algorithm-----------

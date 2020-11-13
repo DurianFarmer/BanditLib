@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import random
 import math
-from BaseAlg import BaseAlg
+from .BaseAlg import BaseAlg
 
 class NeuralCF(torch.nn.Module):
     def __init__(self, dim, hidden_dim, device):
@@ -31,7 +31,7 @@ class NeuralCF(torch.nn.Module):
 
         torch.nn.init.uniform_(self.GMF.weight, a=0.0, b=stddev)
         torch.nn.init.uniform_(self.MLP.weight, a=0.0, b=stddev)
-        
+
         self.total_param = sum(p.numel() for p in self.parameters() if p.requires_grad)
         self.to(device)
 
@@ -63,8 +63,8 @@ class NeuralCFAlgorithm(BaseAlg):
 
         self.path = './Dataset/Yahoo/YahooKMeansModel/10kmeans_model160.dat'
         self.user_feature = torch.from_numpy(np.genfromtxt(self.path, delimiter=' ')).to(device=self.device, dtype=torch.float)
-        
-        
+
+
     def decide(self, pool_articles, userID, k=1):
         select_article = None
         select_score = None
@@ -100,7 +100,7 @@ class NeuralCFAlgorithm(BaseAlg):
                 self.click_history = torch.cat((self.click_history[1:], click_tensor))
                 self.user_history = torch.cat((self.user_history[1:], user_vec))
                 self.article_history = torch.cat((self.article_history[1:], x))
-        
+
             # update the network
             optim = torch.optim.SGD(self.learner.parameters(), lr=self.lr, weight_decay=self.lamdba / self.len)
             self.learner.train()
@@ -110,5 +110,5 @@ class NeuralCFAlgorithm(BaseAlg):
                 loss = self.loss_func(pred, self.click_history)
                 loss.backward()
                 optim.step()
-            print loss.item(), optim.param_groups[0]['weight_decay'], torch.mean(self.click_history).item()
+            print(loss.item(), optim.param_groups[0]['weight_decay'], torch.mean(self.click_history).item())
             self.learner.eval()

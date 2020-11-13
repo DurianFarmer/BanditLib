@@ -2,8 +2,10 @@ import torch
 import numpy as np
 import random
 import math
-from BaseAlg import BaseAlg
+from .BaseAlg import BaseAlg
 import time
+from backpack import backpack, extend
+from backpack.extensions import BatchGrad
 
 class NeuMF(torch.nn.Module):
     def __init__(self, user_dim, item_dim, mf_dim, mlp_dim, lr):
@@ -21,14 +23,13 @@ class NeuMF(torch.nn.Module):
         for idx in range(len(mlp_dim) - 1):
             layers.append(torch.nn.Linear(mlp_dim[idx], mlp_dim[idx + 1]))
             layers.append(torch.nn.ReLU())
-        
+
         self.MLP_layers = torch.nn.Sequential(*layers)
         self.prediction = torch.nn.Linear(mf_dim + mlp_dim[-1], 1)
-        
+
         self.lr = lr
         self.optim = torch.optim.Adam(self.parameters(), lr=self.lr)
         self.sigmoid = torch.nn.Sigmoid()
-        self.loss = torch.nn.BCELoss()
 
         self.total_param = sum(p.numel() for p in self.parameters() if p.requires_grad)
 
@@ -44,15 +45,6 @@ class NeuMF(torch.nn.Module):
 
         prediction_vector = torch.cat((mf_vector, mlp_vector), 1)
         return self.sigmoid(self.prediction(prediction_vector))
-
-    def get_grad(self, score):
-        self.zero_grad()
-        score.backward(retain_graph=True)
-        return torch.cat([
-            p.grad.flatten().detach() 
-            if p.requires_grad else torch.tensor([], device=torch.device('cpu'))
-            for p in self.parameters()
-            ]).view(1, -1)
 
 
 class DataLoader(torch.utils.data.Dataset):
@@ -78,7 +70,7 @@ class DataLoader(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         return {
             'user': self.user_history[idx],
-            'article': torch.from_numpy(self.article_history[idx]).to(torch.float), 
+            'article': torch.from_numpy(self.article_history[idx]).to(torch.float),
             'click': torch.tensor(self.click_history[idx], dtype=torch.float)
             }
 
@@ -86,41 +78,48 @@ class DataLoader(torch.utils.data.Dataset):
 class NeuMFYahooAlgorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)
-        self.learner = NeuMF(user_dim=5, item_dim=5, mf_dim=8, mlp_dim = [16], lr=1e-3).eval()
+        self.learner = extend(NeuMF(user_dim=5, item_dim=5, mf_dim=8, mlp_dim = [16], lr=1e-2).cuda())
+        self.lossfunc = extend(torch.nn.BCELoss())
+        self.lossfunc_reg = extend(torch.nn.BCELoss())
 
         self.path = './Dataset/Yahoo/YahooKMeansModel/10kmeans_model160.dat'
-        self.user_feature = torch.from_numpy(np.genfromtxt(self.path, delimiter=' ')).to(dtype=torch.float)
+        self.user_feature = torch.from_numpy(np.genfromtxt(self.path, delimiter=' ')).to(dtype=torch.float).cuda()
 
         self.data = DataLoader()
         self.cnt = 0
-        self.batch = 256
+        self.batch = 1024
+
 
         torch.set_num_threads(8)
         torch.set_num_interop_threads(8)
-        
-        self.lamdba = 0.1
-        self.nu = 1e-3
-        self.U = self.lamdba * torch.ones((self.learner.total_param), dtype=torch.float)
-        self.U1 = torch.zeros((self.learner.total_param), dtype=torch.float)
+
+        self.lamdba = 1
+        self.nu = 1
+        self.U = self.lamdba * torch.ones((self.learner.total_param), dtype=torch.float).cuda()
+        self.U1 = torch.zeros((self.learner.total_param), dtype=torch.float).cuda()
         self.g = None
         self.reg = None
-
         self.t1 = time.time()
 
 
     def decide(self, pool_articles, userID, k=1):
-        t1 = time.time()
-        user_vec = torch.cat(len(pool_articles)*[self.user_feature[userID].view(1, -1)])
+        self.a = len(pool_articles)
+        t = time.time()
+        
+        user_vec = torch.cat(self.a*[self.user_feature[userID].view(1, -1)])
         article_vec = torch.cat([
             torch.from_numpy(x.contextFeatureVector[:self.dimension]).view(1, -1).to(torch.float32)
             for x in pool_articles])
-        score = self.learner(user_vec, article_vec).view(-1)
-        grad = torch.cat([self.learner.get_grad(x) for x in score])
+        score = self.learner(user_vec, article_vec.cuda()).view(-1)
+        sum_score = torch.sum(score)
+        with backpack(BatchGrad()):
+            sum_score.backward()
+        
+        grad = torch.cat([p.grad_batch.view(self.a, -1) for p in self.learner.parameters()], dim=1)
         sigma = torch.sqrt(torch.sum(grad * grad / self.U, dim=1))
-        self.reg = torch.mean(sigma).item()
+        self.reg = self.nu * torch.mean(sigma).item()
         arm = torch.argmax(score + self.nu * sigma).item()
         self.g = grad[arm]
-        arm = torch.argmax(score).item()
         return [pool_articles[arm]]
 
     def updateParameters(self, articlePicked, click, userID):
@@ -129,7 +128,7 @@ class NeuMFYahooAlgorithm(BaseAlg):
             article_vec = articlePicked.contextFeatureVector[:self.dimension]
             assert self.g is not None
             self.U1 += self.g * self.g
-            
+
             self.data.push(user_vec, article_vec, click)
             self.cnt = (self.cnt + 1) % self.batch
             if self.cnt % self.batch == 0:
@@ -137,12 +136,12 @@ class NeuMFYahooAlgorithm(BaseAlg):
                 t2 = time.time() - self.t1
                 t1 = time.time()
                 dataloader = torch.utils.data.DataLoader(self.data, batch_size=self.batch, shuffle=True, num_workers=0)
-                self.learner.train().cuda()
+                # self.learner.train().cuda()
 
                 loss_list = []
                 early_cnt = 0
 
-                for i in range(1000):
+                for i in range(100):
                     tot_loss = 0
                     for j, batch in enumerate(dataloader):
                         self.learner.optim.zero_grad()
@@ -150,7 +149,7 @@ class NeuMFYahooAlgorithm(BaseAlg):
                         a = batch['article'].cuda()
                         c = batch['click'].cuda()
                         pred = self.learner(u, a).view(-1)
-                        loss = self.learner.loss(pred, c)
+                        loss = self.lossfunc(pred, c)
                         tot_loss += loss.item()
                         loss.backward()
                         self.learner.optim.step()
@@ -164,11 +163,11 @@ class NeuMFYahooAlgorithm(BaseAlg):
                         break
                     loss_list.append(tot_loss / (j + 1))
 
-                self.learner.eval().cpu()
+                # self.learner.eval().cpu()
                 self.U += self.U1
                 self.U1 *= 0
-                print '[{:.2f}, {:.2f} s]: loss: {:.3f}, data: {}, iterations: {}, Covar: {:.2f}'.format(
-                    t2, time.time() - t1, loss_list[-1], len(self.data), i + 1, self.reg)
+                print('[{:.2f}, {:.2f} s]: loss: {:.3f}, data: {}, iterations: {}, Covar: {:.2f}'.format(
+                    t2, time.time() - t1, loss_list[-1], len(self.data), i + 1, self.reg))
                 self.t1 = time.time()
 
 
@@ -183,7 +182,7 @@ class NeuMFLastFMAlgorithm(BaseAlg):
 
         torch.set_num_threads(8)
         torch.set_num_interop_threads(8)
-        
+
         self.lamdba = 1e-3
         self.nu = 1e-2
         self.U = self.lamdba * torch.ones((self.learner.total_param), dtype=torch.float)
@@ -217,7 +216,7 @@ class NeuMFLastFMAlgorithm(BaseAlg):
             article_vec = articlePicked.contextFeatureVector[:self.dimension]
             assert self.g is not None
             self.U1 += self.g * self.g
-            
+
             self.data.push(user_vec, article_vec, click)
             self.cnt = (self.cnt + 1) % self.batch
             if self.cnt % self.batch == 0:
@@ -255,7 +254,6 @@ class NeuMFLastFMAlgorithm(BaseAlg):
                 self.learner.eval().cpu()
                 self.U += self.U1
                 self.U1 *= 0
-                print '[{:.2f}, {:.2f} s]: loss: {:.3f}, data: {}, iterations: {}, Covar: {:.2f}'.format(
-                    t2, time.time() - t1, loss_list[-1], len(self.data), i + 1, self.reg)
+                print('[{:.2f}, {:.2f} s]: loss: {:.3f}, data: {}, iterations: {}, Covar: {:.2f}'.format(
+                    t2, time.time() - t1, loss_list[-1], len(self.data), i + 1, self.reg))
                 self.t1 = time.time()
-

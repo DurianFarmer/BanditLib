@@ -1,5 +1,5 @@
-import re 			# regular expression library
-from random import random, choice 	# for random strategy
+import re                       # regular expression library
+from random import random, choice       # for random strategy
 from operator import itemgetter
 import numpy as np
 from scipy.sparse import csgraph
@@ -8,18 +8,18 @@ import pickle
 #import matplotlib.pyplot as plt
 
 def vectorize(M):
-	temp = []
-	for i in range(M.shape[0]*M.shape[1]):
-		temp.append(M.T.item(i))
-	V = np.asarray(temp)
-	return V
+    temp = []
+    for i in range(M.shape[0]*M.shape[1]):
+        temp.append(M.T.item(i))
+    V = np.asarray(temp)
+    return V
 
 def matrixize(V, C_dimension):
-	temp = np.zeros(shape = (C_dimension, len(V)/C_dimension))
-	for i in range(len(V)/C_dimension):
-		temp.T[i] = V[i*C_dimension : (i+1)*C_dimension]
-	W = temp
-	return W
+    temp = np.zeros(shape = (C_dimension, len(V)/C_dimension))
+    for i in range(len(V)/C_dimension):
+        temp.T[i] = V[i*C_dimension : (i+1)*C_dimension]
+    W = temp
+    return W
 
 #read centroids from file
 def getClusters(fileNameWriteCluster):
@@ -42,8 +42,8 @@ def getArticleDic(fileNameRead):
             if l >=1:
                 line = line.split(';')
                 word = line[1].split('  ')
-                
-		if len(word)==5:
+
+                if len(word)==5:
                     for i in range(5):
                         featureVec.append(float(word[i]))
                     if int(line[0]) not in articleDict:
@@ -53,40 +53,40 @@ def getArticleDic(fileNameRead):
 
 # get cluster assignment of V, M is cluster centroids
 def getIDAssignment(V, M):
-        MinDis = float('+inf')
-        assignment = None
-        for i in range(M.shape[0]):
-            dis = distance.euclidean(V, M[i])
-            if dis < MinDis:
-                assignment = i
-                MinDis = dis
-        return assignment
+    MinDis = float('+inf')
+    assignment = None
+    for i in range(M.shape[0]):
+        dis = distance.euclidean(V, M[i])
+        if dis < MinDis:
+            assignment = i
+            MinDis = dis
+    return assignment
 
 # This code simply reads one line from the source files of Yahoo!
 def parseLine(line):
-        line = line.split("|")
-        
-        tim, articleID, click = line[0].strip().split(" ")
-        tim, articleID, click = int(tim), int(articleID), int(click)
-        user_features = np.array([float(x.strip().split(':')[1]) for x in line[1].strip().split(' ')[1:]])
-        
-        pool_articles = [l.strip().split(" ") for l in line[2:]]
-        pool_articles = np.array([[int(l[0])] + [float(x.split(':')[1]) for x in l[1:]] for l in pool_articles])
-        return tim, articleID, click, user_features, pool_articles
+    line = line.split("|")
+
+    tim, articleID, click = line[0].strip().split(" ")
+    tim, articleID, click = int(tim), int(articleID), int(click)
+    user_features = np.array([float(x.strip().split(':')[1]) for x in line[1].strip().split(' ')[1:]])
+
+    pool_articles = [l.strip().split(" ") for l in line[2:]]
+    pool_articles = np.array([[int(l[0])] + [float(x.split(':')[1]) for x in l[1:]] for l in pool_articles])
+    return tim, articleID, click, user_features, pool_articles
 
 
 # read line with userID instead of user features
 def parseLine_ID(line):
-        line = line.split("|")
-        
-        tim, articleID, click = line[0].strip().split(" ")
-        tim, articleID, click = int(tim), int(articleID), int(click)
-        
-        userID = int(line[1].strip())
-        
-        pool_articles = [l.strip().split(" ") for l in line[2:]]
-        pool_articles = np.array([[int(l[0])] + [float(x.split(':')[1]) for x in l[1:]] for l in pool_articles])
-        return tim, articleID, click, userID, pool_articles
+    line = line.split("|")
+
+    tim, articleID, click = line[0].strip().split(" ")
+    tim, articleID, click = int(tim), int(articleID), int(click)
+
+    userID = int(line[1].strip())
+
+    pool_articles = [l.strip().split(" ") for l in line[2:]]
+    pool_articles = np.array([[int(l[0])] + [float(x.split(':')[1]) for x in l[1:]] for l in pool_articles])
+    return tim, articleID, click, userID, pool_articles
 
 
 def save_to_file(fileNameWrite, recordedStats, tim):
@@ -98,7 +98,7 @@ def save_to_file(fileNameWrite, recordedStats, tim):
 
 
 
-def initializeGW(W, epsilon):  
+def initializeGW(W, epsilon):
     n = len(W)
     G = np.zeros(shape = (n, n))
     for i in range(n):
@@ -108,8 +108,8 @@ def initializeGW(W, epsilon):
     L = csgraph.laplacian(G, normed = False)
     I = np.identity(n)
     GW = I + epsilon*L
-    print GW
-    
+    print(GW)
+
     return GW
 
 
@@ -118,17 +118,17 @@ def initializeW(userFeatureVectors, sparsityLevel):
     W = np.zeros(shape = (n, n))
 
     for i in range(n):
-            sSim = 0
-            for j in range(n):
-                sim = np.dot(userFeatureVectors[i], userFeatureVectors[j])
-                W[i][j] = sim
-                sSim += sim
-            
-            W[i] /= sSim
+        sSim = 0
+        for j in range(n):
+            sim = np.dot(userFeatureVectors[i], userFeatureVectors[j])
+            W[i][j] = sim
+            sSim += sim
+
+        W[i] /= sSim
     SparseW = W
-    
+
     if sparsityLevel > 0 and sparsityLevel <n:
-        print 'Yesyesyes'
+        print('Yesyesyes')
         for i in range(n):
             similarity = sorted(W[i], reverse = True)
             threshold = similarity[sparsityLevel]
@@ -136,27 +136,27 @@ def initializeW(userFeatureVectors, sparsityLevel):
                 if W[i][j] <= threshold:
                     SparseW[i][j] = 0
             SparseW[i] /= sum(SparseW[i])
-    
-    print 'SparseW', SparseW
+
+    print('SparseW', SparseW)
     return SparseW.T
-    
+
 
 
 def initializeW_opt(userFeatureVectors, sparsityLevel):
     n = len(userFeatureVectors)
     W = np.zeros(shape = (n, n))
-    
+
     for i in range(n):
-            sSim = 0
-            for j in range(n):
-                sim = np.dot(userFeatureVectors[i], userFeatureVectors[j])
-                if i == j:
-                    W[i][j] = 0
-                else:
-                    W[i][j] = sim
-                sSim += sim            
+        sSim = 0
+        for j in range(n):
+            sim = np.dot(userFeatureVectors[i], userFeatureVectors[j])
+            if i == j:
+                W[i][j] = 0
+            else:
+                W[i][j] = sim
+            sSim += sim
     SparseW = W
-    
+
     if sparsityLevel > 0 and sparsityLevel <n:
         for i in range(n):
             similarity = sorted(W[i], reverse = True)
@@ -172,7 +172,7 @@ def initializeW_opt(userFeatureVectors, sparsityLevel):
         else:
             SparseW[i][i] = 1
         SparseW[i] /=sum(SparseW[i])
-    print 'SparseW --Opt', SparseW
+    print('SparseW --Opt', SparseW)
     return SparseW.T
 
 
@@ -185,13 +185,13 @@ def model_dump(obj, filename, line, day):
     fout = open(filename +'.txt', 'w')
     fout.write("day\t"+str(day))
     fout.write("line\t"+str(linenum))
-    fout.close()    
+    fout.close()
     fout = open(filename +'.model', 'w')
     pickle.dump(obj, fout)
     fout.close()
 
 
-# data structure to store ctr   
+# data structure to store ctr
 class articleAccess():
     def __init__(self):
         self.accesses = 0.0 # times the article was chosen to be presented as the best articles

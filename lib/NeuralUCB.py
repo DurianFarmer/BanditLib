@@ -5,7 +5,7 @@ import math
 
 from util_functions import vectorize
 from Recommendation import Recommendation
-from BaseAlg import BaseAlg
+from .BaseAlg import BaseAlg
 
 class NeuralUCB(torch.nn.Module):
     def __init__(self, input_dim, hidden_dim, thres, lr, decay, iter):
@@ -107,7 +107,7 @@ class NeuralUCBUserStruct:
 class NeuralUCBAlgorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)
-        print arg_dict
+        print(arg_dict)
         torch.set_num_threads(8)
         self.users = [
             NeuralUCBUserStruct(self.dimension, self.hidden_layer_dimension, self.thres, self.device, self.lr, self.decay, self.iter, self.sz, self.lamdba, self.nu) for _ in range(self.n_users)
@@ -131,7 +131,7 @@ class NeuralUCBAlgorithm(BaseAlg):
 class NeuralUCB1Algorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)
-        print arg_dict
+        print(arg_dict)
         torch.set_num_threads(8)
         self.users = [
             NeuralUCBUserStruct(self.dimension, self.hidden_layer_dimension, self.thres, self.device, self.lr, self.decay, self.iter, self.sz, self.lamdba, self.nu) for _ in range(self.n_users)
@@ -152,7 +152,7 @@ class NeuralUCB1Algorithm(BaseAlg):
 class NeuralUCB2Algorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)
-        print arg_dict
+        print(arg_dict)
         torch.set_num_threads(8)
         self.users = [
             NeuralUCBUserStruct(self.dimension, self.hidden_layer_dimension, self.thres, self.device, self.lr, self.decay, self.iter, self.sz, self.lamdba, self.nu) for _ in range(self.n_users)

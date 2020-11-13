@@ -47,7 +47,7 @@ class DatasetRewardManager():
         RandomChoice = randomStruct()
         RandomChoiceRegret = []
 
-        for alg_name, alg in algorithms.items():
+        for alg_name, alg in list(algorithms.items()):
             AlgReward[alg_name] = []
             AlgPicked[alg_name] = []
             AlgRegret[alg_name] = []
@@ -78,14 +78,14 @@ class DatasetRewardManager():
 
                 shuffle(articlePool[:self.poolArticleSize])
 
-                for alg_name, alg in algorithms.items():
+                for alg_name, alg in list(algorithms.items()):
                     if alg_name in ['CoLinUCB', 'CoLinRankOne', 'factorLinUCB', 'GOBLin', 'LearnWl2', 'LearnWl1', 'LearnWl1_UpdateA', 'LearnWl2_UpdateA', 'LearnW_WRegu']:
                         currentUserID = self.label[userID]
                     else:
                         currentUserID = userID
                     pickedArticle = alg.createRecommendation(
                         articlePool, currentUserID, self.k).articles[0]
-                    
+
 
                     if (pickedArticle.id == article_chosen):
                         reward = 1
@@ -129,16 +129,16 @@ class DatasetRewardManager():
     def plot_result(self, algorithms, BatchCumlateRegret, tim_, RandomChoiceRegret, AlgRewardRatio_vsRandom):
         # plot the results
         f, axa = plt.subplots(1, sharex=True)
-        for alg_name in algorithms.iterkeys():
+        for alg_name in algorithms.keys():
             axa.plot(tim_, BatchCumlateRegret[alg_name], label=alg_name)
-            print '%s: %.2f' % (alg_name, BatchCumlateRegret[alg_name][-1])
+            print('%s: %.2f' % (alg_name, BatchCumlateRegret[alg_name][-1]))
 
-        print("RandomChoiceRegret: " + str(RandomChoiceRegret[-1]))
+        print(("RandomChoiceRegret: " + str(RandomChoiceRegret[-1])))
         print("")
 
         # plot the results
         f, axa = plt.subplots(1, sharex=True)
-        for alg_name in algorithms.iterkeys():
+        for alg_name in algorithms.keys():
             axa.plot(tim_, BatchCumlateRegret[alg_name], label=alg_name)
         axa.plot(tim_, RandomChoiceRegret, label='Random Choice')
 
@@ -150,10 +150,10 @@ class DatasetRewardManager():
 
         # plot the results
         f, axa = plt.subplots(1, sharex=True)
-        for alg_name in algorithms.iterkeys():
+        for alg_name in algorithms.keys():
             axa.plot(tim_, AlgRewardRatio_vsRandom[alg_name], label=alg_name)
-            print '%s: %.2f' % (
-                alg_name, AlgRewardRatio_vsRandom[alg_name][-1])
+            print('%s: %.2f' % (
+                alg_name, AlgRewardRatio_vsRandom[alg_name][-1]))
 
         axa.legend(loc='upper left', prop={'size': 9})
         axa.set_xlabel("Iteration")
@@ -162,15 +162,15 @@ class DatasetRewardManager():
         plt.show()
 
     def batchRecord(self, algorithms, iter_, tstart, articles_random, AlgPicked):
-        print "Datapoint #%d" % iter_, " Elapsed time", datetime.datetime.now() - \
-            tstart
+        print("Datapoint #%d" % iter_, " Elapsed time", datetime.datetime.now() - \
+            tstart)
 
     # Creates file to record reward of each algorithm after each batch completes
     def set_up_regret_file(self, filenameWriteRegret, algorithms):
         with open(filenameWriteRegret, 'w') as f:
             f.write('Time(Iteration),Random')
             f.write(',' + ','.join([str(alg_name)
-                                    for alg_name in algorithms.iterkeys()]))
+                                    for alg_name in algorithms.keys()]))
             f.write('\n')
 
     def write_regret_to_file(self, filenameWriteRegret, algorithms, BatchCumlateRegret, iter_, randomRegret):
@@ -178,5 +178,5 @@ class DatasetRewardManager():
             f.write(str(iter_))
             f.write(',' + str(randomRegret))
             f.write(',' + ','.join([str(BatchCumlateRegret[alg_name][-1])
-                                    for alg_name in algorithms.iterkeys()]))
+                                    for alg_name in algorithms.keys()]))
             f.write('\n')

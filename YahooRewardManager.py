@@ -60,7 +60,7 @@ class YahooRewardManager():
         def printWrite():
             randomLearnCTR = articles_random.learn_stats.updateCTR()
             recordedStats = [randomLearnCTR]
-            for alg_name, alg in algorithms.items():
+            for alg_name, alg in list(algorithms.items()):
                 algCTR = alg.learn_stats.updateCTR()
                 recordedStats.append(algCTR)
                 recordedStats.append(alg.learn_stats.accesses)
@@ -73,15 +73,15 @@ class YahooRewardManager():
 
         def WriteStat():
             with open(fileNameWriteStatTP, 'a+') as f:
-                for key, val in articleTruePositve.items():
+                for key, val in list(articleTruePositve.items()):
                     f.write(str(key) + ';' + str(val) + ',')
                 f.write('\n')
             with open(fileNameWriteStatTN, 'a+') as f:
-                for key, val in articleTrueNegative.items():
+                for key, val in list(articleTrueNegative.items()):
                     f.write(str(key) + ';' + str(val) + ',')
                 f.write('\n')
             with open(fileNameWriteStatFP, 'a+') as f:
-                for key, val in articleFalsePositive.items():
+                for key, val in list(articleFalsePositive.items()):
                     f.write(str(key) + ';' + str(val) + ',')
                 f.write('\n')
 
@@ -114,7 +114,7 @@ class YahooRewardManager():
         alg_accesses = {}
         alg_clicks = {}
         alg_CTR = {}
-        for alg_name, alg in algorithms.items():
+        for alg_name, alg in list(algorithms.items()):
             alg.learn_stats = articleAccess()
 
 
@@ -152,7 +152,7 @@ class YahooRewardManager():
             with open(fileNameWrite, 'a+') as f:
                 f.write('\nNewRunAt  ' + datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'))
                 f.write('\n,Time,RandomCTR;')
-                for alg_name, alg in algorithms.items():
+                for alg_name, alg in list(algorithms.items()):
                     f.write(str(alg_name) + 'CTR;' + str(alg_name) + 'accesses;' + str(alg_name) + 'clicks;' + '' + '\n')
 
             print(fileName)
@@ -190,7 +190,7 @@ class YahooRewardManager():
                     # article picked by random strategy
                     articles_random.learn_stats.addrecord(click)
 
-                    for alg_name, alg in algorithms.items():
+                    for alg_name, alg in list(algorithms.items()):
                         pickedArticle = alg.createRecommendation(articlePool, currentUserID, self.k)
                         pickedArticle = pickedArticle.articles[0]
 
@@ -205,7 +205,7 @@ class YahooRewardManager():
                     # Record current click through rate
                     if totalObservations % 2000 == 0:
                         articles_random.learn_stats.updateCTR()
-                        for alg in algorithms.values():
+                        for alg in list(algorithms.values()):
                             algCTR = alg.learn_stats.updateCTR()
                         printWrite()
 
@@ -213,7 +213,7 @@ class YahooRewardManager():
                     #     break
 
                 # print stuff to screen and save parameters to file when the Yahoo! dataset file ends
-                print("Day " + dataDay + " + Time Elapsed: ", str(datetime.datetime.now() - tstart))
+                print(("Day " + dataDay + " + Time Elapsed: ", str(datetime.datetime.now() - tstart)))
                 # plot_results(algorithms, articles_random)
 
 

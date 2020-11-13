@@ -16,13 +16,13 @@ def parseLine_ID(line):
 userInfo = {}
 for day in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']:
     filename = "ydata-fp-td-clicks-v1_0.200905{}.160.userID".format(day)
-    print("Day {}".format(day))
+    print(("Day {}".format(day)))
     with open(filename, 'r') as f:
         # reading file line ie observations running one at a time
         for i, line in enumerate(f, 1):
             tim, article_chosen, click, currentUserID, pool_articles = parseLine_ID(line)
 
-            if currentUserID not in userInfo.keys():
+            if currentUserID not in list(userInfo.keys()):
                 userInfo[currentUserID] = set()
 
             for article in pool_articles:
@@ -32,8 +32,8 @@ for day in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']:
                     userInfo[currentUserID].add(article_id)
 
             if i % 10000 == 0:
-                print("Line: {}".format(i))
+                print(("Line: {}".format(i)))
 
 
-for userid in userInfo.keys():
-    print(userid, len(userInfo[userid]))
+for userid in list(userInfo.keys()):
+    print((userid, len(userInfo[userid])))
