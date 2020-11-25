@@ -142,15 +142,15 @@ alg:
     #    W: False
     #    V: False
 
-    #FactorUCB:
-    #  alpha: 0.05
-    #  alpha2: 0.025
-    #  lambda_: 0.1
-    #  parameters:
-    #    Theta: False
-    #    CoTheta: True
-    #    W: False
-    #    V: True
+    FactorUCB:
+     alpha: 0.05
+     alpha2: 0.025
+     lambda_: 0.1
+     parameters:
+       Theta: False
+       CoTheta: True
+       W: False
+       V: True
 
     #CLUB:
     #  alpha: 0.1
