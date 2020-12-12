@@ -36,7 +36,7 @@ from lib.LinPHE import LinPHEAlgorithm
 # from lib.NeuralUCB import NeuralUCBAlgorithm, NeuralUCB1Algorithm, NeuralUCB2Algorithm
 # from lib.NeuralCF import NeuralCFAlgorithm
 # from lib.NeuralGlobal import NeuralGlobalAlgorithm
-from lib.NeuMF import NeuMFYahooAlgorithm, NeuMFLastFMAlgorithm
+from lib.NeuMF import NeuMFYahooAlgorithm, NeuMFLastFMAlgorithm, NeuMFDeliciousAlgorithm
 from lib.MLP import MLPAlgorithm
 
 def pca_articles(articles, order):

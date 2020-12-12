@@ -18,7 +18,7 @@ general:
   testing_method: 'online' # (string) online: update the model after each iterations
   plot: False # (True/False) Should plots be created
   collaborative: True # (True/False) connection between collaborative user and social_linear rewards
-  dataset: LastFM # (string None/LastFM/Delicious/Yahoo) Choosing a dataset rather than simluation will override some of the other paramaters
+  dataset: Delicious # (string None/LastFM/Delicious/Yahoo) Choosing a dataset rather than simluation will override some of the other paramaters
 
 # Different settings for user objects
 user:
@@ -58,7 +58,7 @@ alg:
   # Specific Parameters, setting in this section under an algorithm will overwrite default and 
   #   general parameters for that algorithm
   specific:
-    NeuMFLastFM:
+    NeuMFDelicious:
       device: 'cuda'
       hidden_dim: 4
       lamdba: 0.1
