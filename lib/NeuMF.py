@@ -192,10 +192,12 @@ class NeuMFYahooAlgorithm(BaseAlg):
 class NeuMFLastFMAlgorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)
-        self.learner = extend(NeuMF(user_dim=25, item_dim=25, mf_dim=32, mlp_dim = [32, 16, 8], lr=1e-3).cuda())
+        #! changed the user and item dimensions
+        self.learner = extend(NeuMF(user_dim=100, item_dim=100, mf_dim=32, mlp_dim = [32, 16, 8], lr=1e-3).cuda())
         self.lossfunc = extend(torch.nn.BCELoss())
 
-        self.path = './Dataset/LastFM.dat'
+        #! changed the user embedding filename
+        self.path = './Dataset/lastfm_100.dat'
         self.user_feature = torch.from_numpy(np.genfromtxt(self.path, delimiter=' ')).to(dtype=torch.float).cuda()
 
         self.data = DataLoader()
@@ -286,10 +288,12 @@ class NeuMFLastFMAlgorithm(BaseAlg):
 class NeuMFDeliciousAlgorithm(BaseAlg):
     def __init__(self, arg_dict):
         BaseAlg.__init__(self, arg_dict)
-        self.learner = extend(NeuMF(user_dim=25, item_dim=25, mf_dim=32, mlp_dim = [32, 16, 8], lr=1e-3).cuda())
+        #! changed the user and item dimensions
+        self.learner = extend(NeuMF(user_dim=100, item_dim=100, mf_dim=32, mlp_dim = [32, 16, 8], lr=1e-3).cuda())
         self.lossfunc = extend(torch.nn.BCELoss())
 
-        self.path = './Dataset/delicious.dat'
+        #! changed the user embedding filename
+        self.path = './Dataset/delicious_100.dat'
         self.user_feature = []
         with open(self.path, 'r') as f:
             for line in f:

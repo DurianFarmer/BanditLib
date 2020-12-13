@@ -27,10 +27,15 @@ LastFM_address = './Dataset/hetrec2011-lastfm-2k'
 Delicious_address = './Dataset/hetrec2011-delicious-2k'
 Yahoo_address = './Dataset/Yahoo/YahooData'
 
-LastFM_FeatureVectorsFileName = os.path.join(LastFM_address, 'Arm_FeatureVectors_2.dat')
+# change the name of feature vector here:
+# Arm_FeatureVectors_2.dat: 25 dimensions
+# Arm_FeatureVectors_LastFM_100.dat: 100 dimensions
+LastFM_FeatureVectorsFileName = os.path.join(LastFM_address, 'Arm_FeatureVectors_LastFM_100.dat')
 LastFM_relationFileName = os.path.join(LastFM_address, 'user_friends.dat.mapped')
 
-Delicious_FeatureVectorsFileName = os.path.join(Delicious_address, 'Arm_FeatureVectors_2.dat')
+# Arm_FeatureVectors_2.dat: 25 dimensions
+# Arm_FeatureVectors_Delicious_100.dat: 100 dimensions
+Delicious_FeatureVectorsFileName = os.path.join(Delicious_address, 'Arm_FeatureVectors_Delicious_100.dat')
 Delicious_relationFileName = os.path.join(Delicious_address, 'user_contacts.dat.mapped')
 
 Yelp_save_address = "./YelpResults"
